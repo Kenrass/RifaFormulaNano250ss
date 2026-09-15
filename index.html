@@ -445,12 +445,14 @@
 
   <script>
     const STORAGE_KEY = 'numeros_vendidos';
+    const SUPABASE_URL = 'https://reaqfvtzhxwlifcfscvx.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_SiKZRI6F6BTHT7XVTBONTQ_odb6fe_P';
     const CREATOR_CODE = 'Kendall_1816';
     const SELLER_WHATSAPP = '50687936911';
     const PRECIO_NUMERO = 200;
     const carrito = new Set();
     let seleccionado = 0;
-    const vendidos = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+    const vendidos = new Set();
 
     const catalogo = document.getElementById('catalogo');
     const buscarNumero = document.getElementById('buscarNumero');
@@ -475,8 +477,29 @@
       window.open(url, '_blank');
     };
 
-    const guardarVendidos = () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...vendidos]));
+    const supabaseRequest = async (ruta, opciones = {}) => {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${ruta}`, {
+        ...opciones,
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          ...(opciones.headers || {})
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      return response;
+    };
+
+    const cargarVendidos = async () => {
+      const response = await supabaseRequest('numeros_vendidos?select=numero');
+      const filas = await response.json();
+      vendidos.clear();
+      filas.forEach((fila) => vendidos.add(fila.numero));
     };
 
     const actualizarSeleccion = (numero) => {
@@ -530,18 +553,30 @@
       actualizarSeleccion(valor);
     };
 
-    const toggleVendido = (numero) => {
+    const toggleVendido = async (numero) => {
       const valor = formatearNumero(numero);
-      if (vendidos.has(valor)) {
-        vendidos.delete(valor);
-      } else {
-        vendidos.add(valor);
-        carrito.delete(numero);
+      try {
+        if (vendidos.has(valor)) {
+          await supabaseRequest(`numeros_vendidos?numero=eq.${encodeURIComponent(valor)}`, {
+            method: 'DELETE'
+          });
+          vendidos.delete(valor);
+        } else {
+          await supabaseRequest('numeros_vendidos', {
+            method: 'POST',
+            body: JSON.stringify({ numero: valor })
+          });
+          vendidos.add(valor);
+          carrito.delete(numero);
+        }
+
+        renderCatalogo();
+        actualizarCarrito();
+        actualizarSeleccion(numero);
+      } catch (error) {
+        console.error(error);
+        alert('No se pudo guardar el número en Supabase.');
       }
-      guardarVendidos();
-      renderCatalogo();
-      actualizarCarrito();
-      actualizarSeleccion(numero);
     };
 
     const renderCatalogo = () => {
@@ -714,9 +749,19 @@
       if (event.key === 'Enter') buscar();
     });
 
-    renderCatalogo();
-    actualizarCarrito();
-    actualizarSeleccion(0);
+    cargarVendidos()
+      .then(() => {
+        renderCatalogo();
+        actualizarCarrito();
+        actualizarSeleccion(0);
+      })
+      .catch((error) => {
+        console.error(error);
+        alert('No se pudieron cargar los números vendidos.');
+        renderCatalogo();
+        actualizarCarrito();
+        actualizarSeleccion(0);
+      });
   </script>
 </body>
 </html>
