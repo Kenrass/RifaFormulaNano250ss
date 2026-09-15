@@ -450,7 +450,7 @@
     const PRECIO_NUMERO = 200;
     const carrito = new Set();
     let seleccionado = 0;
-    const vendidos = new Set();
+    const vendidos = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
 
     const catalogo = document.getElementById('catalogo');
     const buscarNumero = document.getElementById('buscarNumero');
@@ -475,12 +475,8 @@
       window.open(url, '_blank');
     };
 
-    const cargarVendidos = async () => {
-      const response = await fetch('/api/numeros-vendidos');
-      if (!response.ok) throw new Error('No se pudo cargar el catálogo.');
-      const result = await response.json();
-      vendidos.clear();
-      result.numeros.forEach((numero) => vendidos.add(numero));
+    const guardarVendidos = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...vendidos]));
     };
 
     const actualizarSeleccion = (numero) => {
@@ -534,23 +530,18 @@
       actualizarSeleccion(valor);
     };
 
-    const toggleVendido = async (numero) => {
+    const toggleVendido = (numero) => {
       const valor = formatearNumero(numero);
-      try {
-        const response = await fetch(`/api/numeros-vendidos/${valor}`, { method: 'POST' });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || 'No se pudo actualizar el número.');
-
-        vendidos.clear();
-        result.numeros.forEach((numeroVendido) => vendidos.add(numeroVendido));
-        if (vendidos.has(valor)) carrito.delete(numero);
-        renderCatalogo();
-        actualizarCarrito();
-        actualizarSeleccion(numero);
-      } catch (error) {
-        console.error(error);
-        alert('No se pudo actualizar el número en el catálogo compartido.');
+      if (vendidos.has(valor)) {
+        vendidos.delete(valor);
+      } else {
+        vendidos.add(valor);
+        carrito.delete(numero);
       }
+      guardarVendidos();
+      renderCatalogo();
+      actualizarCarrito();
+      actualizarSeleccion(numero);
     };
 
     const renderCatalogo = () => {
@@ -723,19 +714,9 @@
       if (event.key === 'Enter') buscar();
     });
 
-    cargarVendidos()
-      .then(() => {
-        renderCatalogo();
-        actualizarCarrito();
-        actualizarSeleccion(0);
-      })
-      .catch((error) => {
-        console.error(error);
-        // GitHub Pages sirve la página, pero no ejecuta server.js.
-        renderCatalogo();
-        actualizarCarrito();
-        actualizarSeleccion(0);
-      });
+    renderCatalogo();
+    actualizarCarrito();
+    actualizarSeleccion(0);
   </script>
 </body>
 </html>
