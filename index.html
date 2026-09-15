@@ -731,7 +731,10 @@
       })
       .catch((error) => {
         console.error(error);
-        catalogo.innerHTML = '<p>No se pudo cargar el catálogo. Revisa que el servidor esté encendido.</p>';
+        // GitHub Pages sirve la página, pero no ejecuta server.js.
+        renderCatalogo();
+        actualizarCarrito();
+        actualizarSeleccion(0);
       });
   </script>
 </body>
