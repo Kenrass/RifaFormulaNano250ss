@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';" />
   <title>Catálogo de números</title>
   <style>
     :root {
@@ -36,16 +37,8 @@
       padding: 30px 18px 60px;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
+    .container { max-width: 1200px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 20px; }
     .mini-tag {
       display: inline-block;
       background: rgba(62, 224, 163, 0.12);
@@ -59,7 +52,6 @@
       text-transform: uppercase;
       margin-bottom: 12px;
     }
-
     h1 {
       margin: 0;
       font-size: clamp(2.1rem, 4vw, 3.3rem);
@@ -67,7 +59,6 @@
       letter-spacing: 1px;
       text-shadow: 0 2px 12px rgba(247, 213, 122, 0.25);
     }
-
     .subtitle {
       margin: 12px auto 0;
       color: var(--muted);
@@ -75,7 +66,6 @@
       max-width: 720px;
       line-height: 1.5;
     }
-
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -91,7 +81,6 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(8px);
     }
-
     .buscador {
       display: flex;
       gap: 12px;
@@ -100,7 +89,6 @@
       flex-wrap: wrap;
       flex: 1;
     }
-
     .buscador input {
       flex: 1 1 260px;
       min-width: 220px;
@@ -113,7 +101,6 @@
       outline: none;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-
     .buscador input:focus,
     .form-whatsapp input:focus,
     .creator input:focus {
@@ -121,7 +108,6 @@
       box-shadow: 0 0 0 3px rgba(91, 179, 255, 0.12);
       outline: none;
     }
-
     .precio-numero {
       display: block;
       font-size: 0.7rem;
@@ -130,7 +116,6 @@
       margin-top: 4px;
       letter-spacing: 0.03em;
     }
-
     .buscador button,
     .carrito button,
     .creator button {
@@ -142,20 +127,15 @@
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     }
-
     .buscador button:hover,
     .carrito button:hover,
     .creator button:hover,
-    .numero-boton:hover {
-      transform: translateY(-2px);
-    }
-
+    .numero-boton:hover { transform: translateY(-2px); }
     .buscador button {
       background: linear-gradient(135deg, var(--gold), var(--gold-2));
       color: #1d180d;
       box-shadow: 0 10px 22px rgba(247, 213, 122, 0.22);
     }
-
     .content {
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(290px, 360px);
@@ -163,7 +143,6 @@
       margin-top: 20px;
       align-items: start;
     }
-
     .catalogo {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
@@ -176,7 +155,6 @@
       padding: 18px;
       box-shadow: var(--shadow);
     }
-
     .numero-boton {
       border: 1px solid rgba(255,255,255,0.08);
       background: linear-gradient(180deg, #152a41, #0d1b2b);
@@ -190,14 +168,12 @@
       transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
-
     .numero-boton.disponible {
       background: linear-gradient(135deg, #1ecf87, #169e6f);
       color: #041b13;
       border-color: rgba(30, 207, 135, 0.5);
       font-weight: 800;
     }
-
     .numero-boton.selected {
       background: linear-gradient(135deg, #8ad8ff, #69aefc);
       color: #0a1f32;
@@ -205,7 +181,6 @@
       font-weight: 800;
       box-shadow: 0 0 0 2px rgba(138, 216, 255, 0.28);
     }
-
     .numero-boton.vendido {
       background: linear-gradient(180deg, #491d1d, #2d1010);
       color: #ffc2c2;
@@ -214,7 +189,6 @@
       text-decoration-thickness: 3px;
       opacity: 0.8;
     }
-
     .carrito,
     .creator {
       background: rgba(16, 27, 45, 0.82);
@@ -223,14 +197,12 @@
       padding: 18px;
       box-shadow: var(--shadow);
     }
-
     .carrito {
       position: sticky;
       top: 18px;
       z-index: 20;
       backdrop-filter: blur(10px);
     }
-
     .carrito-header {
       display: flex;
       justify-content: space-between;
@@ -238,14 +210,12 @@
       gap: 10px;
       margin-bottom: 12px;
     }
-
     .carrito h2,
     .creator h2 {
       margin: 0;
       color: var(--gold);
       font-size: 1.2rem;
     }
-
     .cart-count {
       background: rgba(91, 179, 255, 0.12);
       color: var(--accent-2);
@@ -255,7 +225,6 @@
       font-size: 0.76rem;
       font-weight: 700;
     }
-
     .carrito-lista {
       list-style: none;
       padding: 0;
@@ -266,7 +235,6 @@
       max-height: 260px;
       overflow-y: auto;
     }
-
     .carrito-item {
       display: flex;
       justify-content: space-between;
@@ -279,7 +247,6 @@
       border: 1px solid rgba(255,255,255,0.05);
       font-weight: 700;
     }
-
     .carrito-total {
       margin-top: 10px;
       padding-top: 10px;
@@ -290,7 +257,6 @@
       font-weight: 800;
       color: var(--gold);
     }
-
     .carrito-item button {
       background: transparent;
       color: var(--danger);
@@ -299,21 +265,18 @@
       cursor: pointer;
       padding: 0;
     }
-
     .carrito button {
       width: 100%;
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: #061712;
       box-shadow: 0 12px 24px rgba(62, 224, 163, 0.16);
     }
-
     .form-whatsapp {
       margin-top: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-
     .form-whatsapp input {
       width: 100%;
       padding: 12px 14px;
@@ -323,7 +286,6 @@
       color: var(--text);
       font-size: 0.98rem;
     }
-
     .info {
       text-align: center;
       margin-top: 12px;
@@ -332,12 +294,7 @@
       font-weight: 700;
       letter-spacing: 0.02em;
     }
-
-    .creator {
-      display: none;
-      margin-top: 16px;
-    }
-
+    .creator { display: none; margin-top: 16px; }
     .owner-toggle {
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.06);
@@ -347,7 +304,6 @@
       cursor: pointer;
       font-weight: 700;
     }
-
     .creator input {
       width: 100%;
       margin-bottom: 12px;
@@ -357,28 +313,17 @@
       background: rgba(12, 22, 39, 0.96);
       color: var(--text);
     }
-
     .creator button {
       width: 100%;
       background: linear-gradient(135deg, var(--danger), var(--danger-dark));
       color: #fff;
     }
-
     @media (max-width: 900px) {
-      .content {
-        grid-template-columns: 1fr;
-      }
-
-      .carrito {
-        position: static;
-      }
+      .content { grid-template-columns: 1fr; }
+      .carrito { position: static; }
     }
-
     @media (max-width: 520px) {
-      .catalogo {
-        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-      }
-
+      .catalogo { grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); }
       .carrito {
         position: sticky;
         bottom: 14px;
@@ -444,15 +389,15 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'numeros_vendidos';
-    const SUPABASE_URL = 'https://reaqfvtzhxwlifcfscvx.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_SiKZRI6F6BTHT7XVTBONTQ_odb6fe_P';
-    const CREATOR_CODE = 'Kendall_1816';
-    const SELLER_WHATSAPP = '50687936911';
-    const PRECIO_NUMERO = 200;
-    const carrito = new Set();
-    let seleccionado = 0;
-    const vendidos = new Set();
+    const state = {
+      precioNumero: 200,
+      sellerWhatsapp: '',
+      maxNumerosPorPedido: 10,
+      ownerToken: sessionStorage.getItem('ownerToken') || '',
+      carrito: new Set(),
+      numerosVendidos: new Set(),
+      seleccionado: 0
+    };
 
     const catalogo = document.getElementById('catalogo');
     const buscarNumero = document.getElementById('buscarNumero');
@@ -470,56 +415,25 @@
     const totalCarrito = document.getElementById('totalCarrito');
 
     const formatearNumero = (valor) => String(valor).padStart(4, '0');
-
-    const abrirWhatsApp = (texto, numero = SELLER_WHATSAPP) => {
-      const numeroDestino = String(numero).replace(/\D/g, '');
-      const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(texto)}`;
-      window.open(url, '_blank');
-    };
-
-    const supabaseRequest = async (ruta, opciones = {}) => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/${ruta}`, {
-        ...opciones,
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-          'Content-Type': 'application/json',
-          ...(opciones.headers || {})
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-
-      return response;
-    };
-
-    const cargarVendidos = async () => {
-      const response = await supabaseRequest('numeros_vendidos?select=numero');
-      const filas = await response.json();
-      vendidos.clear();
-      filas.forEach((fila) => vendidos.add(fila.numero));
-    };
+    const formatearPrecio = (valor) => `₡${new Intl.NumberFormat('es-CR').format(valor)}`;
 
     const actualizarSeleccion = (numero) => {
-      seleccionado = numero;
+      state.seleccionado = numero;
       const valor = formatearNumero(numero);
-      infoNumero.textContent = `Número seleccionado: ${valor}${vendidos.has(valor) ? ' • Vendido' : ''}`;
+      const status = state.numerosVendidos.has(valor) ? ' • Vendido' : '';
+      infoNumero.textContent = `Número seleccionado: ${valor}${status}`;
       buscarNumero.value = valor;
 
       document.querySelectorAll('.numero-boton').forEach((boton) => {
-        const esSeleccionado = carrito.has(Number(boton.dataset.numero));
+        const esSeleccionado = state.carrito.has(Number(boton.dataset.numero));
         boton.classList.toggle('selected', esSeleccionado);
       });
     };
 
-    const formatearPrecio = (valor) => `₡${new Intl.NumberFormat('es-CR').format(valor)}`;
-
     const actualizarCarrito = () => {
-      const items = [...carrito].sort((a, b) => a - b);
+      const items = [...state.carrito].sort((a, b) => a - b);
       carritoCount.textContent = String(items.length);
-      totalCarrito.textContent = formatearPrecio(items.length * PRECIO_NUMERO);
+      totalCarrito.textContent = formatearPrecio(items.length * state.precioNumero);
 
       if (!items.length) {
         carritoLista.innerHTML = '<li class="carrito-item">No has seleccionado números.</li>';
@@ -530,7 +444,7 @@
         .map((numero) => `
           <li class="carrito-item">
             <span>${formatearNumero(numero)}</span>
-            <span>${formatearPrecio(PRECIO_NUMERO)}</span>
+            <span>${formatearPrecio(state.precioNumero)}</span>
             <button type="button" data-quitar="${numero}">Quitar</button>
           </li>
         `)
@@ -538,7 +452,7 @@
 
       document.querySelectorAll('[data-quitar]').forEach((boton) => {
         boton.addEventListener('click', () => {
-          carrito.delete(Number(boton.dataset.quitar));
+          state.carrito.delete(Number(boton.dataset.quitar));
           actualizarCarrito();
           renderCatalogo();
         });
@@ -547,36 +461,10 @@
 
     const agregarAlCarrito = (numero) => {
       const valor = Number(numero);
-      if (vendidos.has(formatearNumero(valor))) return;
-      carrito.add(valor);
+      if (state.numerosVendidos.has(formatearNumero(valor))) return;
+      state.carrito.add(valor);
       actualizarCarrito();
       actualizarSeleccion(valor);
-    };
-
-    const toggleVendido = async (numero) => {
-      const valor = formatearNumero(numero);
-      try {
-        if (vendidos.has(valor)) {
-          await supabaseRequest(`numeros_vendidos?numero=eq.${encodeURIComponent(valor)}`, {
-            method: 'DELETE'
-          });
-          vendidos.delete(valor);
-        } else {
-          await supabaseRequest('numeros_vendidos', {
-            method: 'POST',
-            body: JSON.stringify({ numero: valor })
-          });
-          vendidos.add(valor);
-          carrito.delete(numero);
-        }
-
-        renderCatalogo();
-        actualizarCarrito();
-        actualizarSeleccion(numero);
-      } catch (error) {
-        console.error(error);
-        alert('No se pudo guardar el número en Supabase.');
-      }
     };
 
     const renderCatalogo = () => {
@@ -588,26 +476,25 @@
         boton.type = 'button';
         boton.className = 'numero-boton';
         boton.dataset.numero = numero;
-        boton.innerHTML = `${numero}<span class="precio-numero">${formatearPrecio(PRECIO_NUMERO)}</span>`;
-        boton.title = `Número ${numero} - ${formatearPrecio(PRECIO_NUMERO)}`;
+        boton.innerHTML = `${numero}<span class="precio-numero">${formatearPrecio(state.precioNumero)}</span>`;
+        boton.title = `Número ${numero} - ${formatearPrecio(state.precioNumero)}`;
 
-        if (vendidos.has(numero)) {
+        if (state.numerosVendidos.has(numero)) {
           boton.classList.add('vendido');
-        } else if (carrito.has(i)) {
+        } else if (state.carrito.has(i)) {
           boton.classList.add('selected');
         } else {
           boton.classList.add('disponible');
         }
 
         boton.addEventListener('click', () => {
-          if (vendidos.has(numero)) return;
-
+          if (state.numerosVendidos.has(numero)) return;
           actualizarSeleccion(i);
 
-          if (!carrito.has(i)) {
+          if (!state.carrito.has(i)) {
             agregarAlCarrito(i);
           } else {
-            carrito.delete(i);
+            state.carrito.delete(i);
             actualizarCarrito();
             renderCatalogo();
           }
@@ -615,6 +502,23 @@
 
         catalogo.appendChild(boton);
       }
+    };
+
+    const cargarConfiguracion = async () => {
+      const response = await fetch('/api/config');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'No se pudo cargar la configuración.');
+      state.precioNumero = Number(data.precioNumero) || 200;
+      state.sellerWhatsapp = String(data.sellerWhatsapp || '');
+      state.maxNumerosPorPedido = Number(data.maxNumerosPorPedido) || 10;
+    };
+
+    const cargarVendidos = async () => {
+      const response = await fetch('/api/numeros-vendidos');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'No se pudo cargar la lista de números.');
+      state.numerosVendidos.clear();
+      (data.numeros || []).forEach((numero) => state.numerosVendidos.add(String(numero)));
     };
 
     const buscar = () => {
@@ -636,6 +540,76 @@
       }
     };
 
+    const mostrarPanelCreador = () => {
+      creatorPanel.style.display = creatorPanel.style.display === 'block' ? 'none' : 'block';
+      if (creatorPanel.style.display === 'block') {
+        inputCodigo.focus();
+      }
+    };
+
+    const validarCreador = async () => {
+      const codigo = inputCodigo.value.trim();
+      if (!codigo) {
+        alert('Escribe el código del dueño.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/owner/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || 'Código incorrecto.');
+        }
+
+        state.ownerToken = result.token;
+        sessionStorage.setItem('ownerToken', result.token);
+        creatorPanel.style.display = 'block';
+        creatorPanel.innerHTML = `
+          <h2>Panel del creador</h2>
+          <input id="numeroVendible" type="text" maxlength="4" placeholder="Número a marcar vendido" inputmode="numeric" />
+          <button id="marcarVendidoBtn" type="button">Marcar / Desmarcar vendido</button>
+        `;
+
+        document.getElementById('marcarVendidoBtn').addEventListener('click', async () => {
+          const numeroInput = document.getElementById('numeroVendible').value.replace(/\D/g, '').slice(0, 4);
+          if (!numeroInput) {
+            alert('Escribe un número válido.');
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/owner/toggle-numero', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${state.ownerToken}`
+              },
+              body: JSON.stringify({ numero: numeroInput })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'No se pudo actualizar el número.');
+
+            await cargarVendidos();
+            renderCatalogo();
+            actualizarCarrito();
+            actualizarSeleccion(Number.parseInt(numeroInput, 10) || 0);
+          } catch (error) {
+            console.error(error);
+            alert(error.message || 'No se pudo actualizar el inventario.');
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        alert(error.message || 'Código incorrecto.');
+      }
+    };
+
     buscarNumero.addEventListener('input', () => {
       const valor = buscarNumero.value.replace(/\D/g, '').slice(0, 4);
       if (valor.length === 4) buscar();
@@ -653,7 +627,7 @@
       const usados = new Set();
       for (let i = 0; i < cantidad; i++) {
         let numero = Math.floor(Math.random() * 10000);
-        while (usados.has(numero) || vendidos.has(formatearNumero(numero))) {
+        while (usados.has(numero) || state.numerosVendidos.has(formatearNumero(numero))) {
           numero = Math.floor(Math.random() * 10000);
         }
         usados.add(numero);
@@ -666,102 +640,65 @@
     });
 
     btnConfirmarCompra.addEventListener('click', async () => {
-      const items = [...carrito].sort((a, b) => a - b);
+      const items = [...state.carrito].sort((a, b) => a - b);
       if (!items.length) {
         alert('Primero agrega números al carrito.');
         return;
       }
 
       const nombreCliente = inputNombreCliente.value.trim();
-
       if (!nombreCliente) {
         alert('Escribe tu nombre completo para continuar.');
         inputNombreCliente.focus();
         return;
       }
 
-      const payload = {
-        nombre: nombreCliente,
-        numero: 'No proporcionado',
-        numeros: items.map((n) => formatearNumero(n))
-      };
-
-      const mensajeCliente = `Buenas, soy ${nombreCliente} 👋\n\nQuiero comprar los siguientes números:\n${items.map((n) => `*${formatearNumero(n)}*`).join(', ')}\n\nTotal estimado: *${formatearPrecio(items.length * PRECIO_NUMERO)}*\n\nMuchas gracias.`;
-
-      abrirWhatsApp(mensajeCliente, SELLER_WHATSAPP);
-
       try {
         const response = await fetch('/api/confirmar-compra', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+            nombre: nombreCliente,
+            numero: 'No proporcionado',
+            numeros: items.map((n) => formatearNumero(n))
+          })
         });
 
         const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Error al enviar la compra');
 
-        if (!response.ok) {
-          throw new Error(result.message || 'Error al enviar la compra');
-        }
-
-        if (result.preview) {
-          console.log(result.preview);
-        }
-
-        alert('✅ Tu pedido fue enviado correctamente.');
+        alert(result.message || '✅ Tu pedido fue enviado correctamente.');
+        state.carrito.clear();
+        actualizarCarrito();
+        renderCatalogo();
       } catch (error) {
         console.error(error);
-        alert('Se abrió WhatsApp con tu mensaje listo para enviar.');
+        alert(error.message || 'No se pudo confirmar la compra.');
       }
     });
 
-    const abrirPanelCreador = () => {
-      if (inputCodigo.value === CREATOR_CODE) {
-        creatorPanel.style.display = 'block';
-        creatorPanel.innerHTML = `
-          <h2>Panel del creador</h2>
-          <input id="numeroVendible" type="text" maxlength="4" placeholder="Número a marcar vendido" inputmode="numeric" />
-          <button id="marcarVendidoBtn" type="button">Marcar / Desmarcar vendido</button>
-        `;
-
-        document.getElementById('marcarVendidoBtn').addEventListener('click', () => {
-          const numeroInput = document.getElementById('numeroVendible').value.replace(/\D/g, '').slice(0, 4);
-          if (!numeroInput) return;
-          const numero = Number.parseInt(numeroInput, 10) || 0;
-          toggleVendido(numero);
-        });
-      } else {
-        alert('Código incorrecto.');
-      }
-    };
-
-    btnAbrirPanelCreador.addEventListener('click', () => {
-      creatorPanel.style.display = creatorPanel.style.display === 'block' ? 'none' : 'block';
-    });
-
-    btnEntrarPanelCreador.addEventListener('click', abrirPanelCreador);
+    btnAbrirPanelCreador.addEventListener('click', mostrarPanelCreador);
+    btnEntrarPanelCreador.addEventListener('click', validarCreador);
     inputCodigo.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        abrirPanelCreador();
-      }
+      if (event.key === 'Enter') validarCreador();
     });
 
     buscarNumero.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') buscar();
     });
 
-    cargarVendidos()
-      .then(() => {
+    (async () => {
+      try {
+        await cargarConfiguracion();
+        await cargarVendidos();
         renderCatalogo();
         actualizarCarrito();
         actualizarSeleccion(0);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error(error);
-        alert('No se pudieron cargar los números vendidos.');
-        renderCatalogo();
-        actualizarCarrito();
-        actualizarSeleccion(0);
-      });
+        alert('No se pudieron cargar los datos del catálogo.');
+      }
+    })();
   </script>
 </body>
 </html>
