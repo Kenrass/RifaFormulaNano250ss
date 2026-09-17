@@ -334,9 +334,6 @@
 </head>
 <body>
   <div class="container">
-    <h1>Catálogo de números</h1>
-    <p class="subtitle">Selecciona los números que te interesen y confirma tu compra por WhatsApp.</p>
-
     <div class="page-header">
       <div class="mini-tag">Números disponibles</div>
       <h1>Catálogo de números</h1>
@@ -381,6 +378,7 @@
 
         <div class="form-whatsapp">
           <input id="nombreCliente" type="text" placeholder="Tu nombre" />
+          <input id="telefonoCliente" type="tel" maxlength="20" placeholder="Tu teléfono" inputmode="tel" autocomplete="tel" />
         </div>
 
         <button id="confirmarCompra" type="button">Confirmar compra por WhatsApp</button>
@@ -393,6 +391,7 @@
       precioNumero: 200,
       sellerWhatsapp: '50687936911',
       maxNumerosPorPedido: 10,
+      apiBase: '',
       ownerToken: sessionStorage.getItem('ownerToken') || '',
       ownerMode: false,
       carrito: new Set(),
@@ -408,6 +407,7 @@
     const carritoLista = document.getElementById('carritoLista');
     const btnConfirmarCompra = document.getElementById('confirmarCompra');
     const inputNombreCliente = document.getElementById('nombreCliente');
+    const inputTelefonoCliente = document.getElementById('telefonoCliente');
     const creatorPanel = document.getElementById('creatorPanel');
     const inputCodigo = document.getElementById('codigoCreador');
     const btnAbrirPanelCreador = document.getElementById('abrirPanelCreador');
@@ -441,15 +441,22 @@
         return;
       }
 
-      carritoLista.innerHTML = items
-        .map((numero) => `
-          <li class="carrito-item">
-            <span>${formatearNumero(numero)}</span>
-            <span>${formatearPrecio(state.precioNumero)}</span>
-            <button type="button" data-quitar="${numero}">Quitar</button>
-          </li>
-        `)
-        .join('');
+      carritoLista.replaceChildren(...items.map((numero) => {
+        const item = document.createElement('li');
+        item.className = 'carrito-item';
+
+        const numeroTexto = document.createElement('span');
+        numeroTexto.textContent = formatearNumero(numero);
+        const precioTexto = document.createElement('span');
+        precioTexto.textContent = formatearPrecio(state.precioNumero);
+        const quitar = document.createElement('button');
+        quitar.type = 'button';
+        quitar.dataset.quitar = String(numero);
+        quitar.textContent = 'Quitar';
+
+        item.append(numeroTexto, precioTexto, quitar);
+        return item;
+      }));
 
       document.querySelectorAll('[data-quitar]').forEach((boton) => {
         boton.addEventListener('click', () => {
@@ -475,7 +482,7 @@
       }
 
       try {
-        const response = await fetch('/api/owner/toggle-numero', {
+        const response = await fetch(apiUrl('/api/owner/toggle-numero'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -539,9 +546,11 @@
       }
     };
 
+    const apiUrl = (ruta) => state.apiBase ? new URL(ruta, state.apiBase).toString() : ruta;
+
     const cargarJsonConFallback = async (rutaApi, rutaFallback) => {
       try {
-        const response = await fetch(rutaApi, { cache: 'no-store' });
+        const response = await fetch(apiUrl(rutaApi), { cache: 'no-store' });
         if (!response.ok) throw new Error('API no disponible');
         return await response.json();
       } catch (error) {
@@ -557,6 +566,7 @@
       state.precioNumero = Number(data.precioNumero) || 200;
       state.sellerWhatsapp = String(data.sellerWhatsapp || '');
       state.maxNumerosPorPedido = Number(data.maxNumerosPorPedido) || 10;
+      state.apiBase = String(data.apiBase || '').trim().replace(/\/$/, '');
     };
 
     const cargarVendidos = async () => {
@@ -599,7 +609,7 @@
       }
 
       try {
-        const response = await fetch('/api/owner/validate', {
+        const response = await fetch(apiUrl('/api/owner/validate'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ codigo })
@@ -674,13 +684,23 @@
         return;
       }
 
+      const telefonoCliente = inputTelefonoCliente.value.replace(/\D/g, '').slice(0, 20);
+      if (telefonoCliente.length < 8) {
+        alert('Escribe un teléfono válido para continuar.');
+        inputTelefonoCliente.focus();
+        return;
+      }
+
+      const numerosTexto = items.map((numero) => formatearNumero(numero)).join(', ');
+      const mensajeWhatsApp = `Hola, soy ${nombreCliente}. Quiero comprar los números: ${numerosTexto}. Mi teléfono es ${telefonoCliente}.`;
+
       try {
-        const response = await fetch('/api/confirmar-compra', {
+        const response = await fetch(apiUrl('/api/confirmar-compra'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             nombre: nombreCliente,
-            numero: 'No proporcionado',
+            numero: telefonoCliente,
             numeros: items.map((n) => formatearNumero(n))
           })
         });
@@ -694,7 +714,13 @@
         renderCatalogo();
       } catch (error) {
         console.error(error);
-        alert(error.message || 'No se pudo confirmar la compra.');
+        if (state.sellerWhatsapp) {
+          const whatsapp = state.sellerWhatsapp.replace(/\D/g, '');
+          window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(mensajeWhatsApp)}`, '_blank', 'noopener,noreferrer');
+          alert('El servidor no está disponible. Se abrió WhatsApp para completar el pedido.');
+        } else {
+          alert('No se pudo confirmar la compra.');
+        }
       }
     });
 
