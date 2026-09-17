@@ -378,7 +378,7 @@
 
         <div class="form-whatsapp">
           <input id="nombreCliente" type="text" placeholder="Tu nombre" />
-          <input id="telefonoCliente" type="tel" maxlength="20" placeholder="Tu teléfono" inputmode="tel" autocomplete="tel" />
+          <input id="telefonoCliente" type="tel" maxlength="20" placeholder="Tu teléfono (opcional)" inputmode="tel" autocomplete="tel" />
         </div>
 
         <button id="confirmarCompra" type="button">Confirmar compra por WhatsApp</button>
@@ -685,14 +685,16 @@
       }
 
       const telefonoCliente = inputTelefonoCliente.value.replace(/\D/g, '').slice(0, 20);
-      if (telefonoCliente.length < 8) {
-        alert('Escribe un teléfono válido para continuar.');
+      if (telefonoCliente && telefonoCliente.length < 8) {
+        alert('Si pones teléfono, debe ser válido.');
         inputTelefonoCliente.focus();
         return;
       }
 
       const numerosTexto = items.map((numero) => formatearNumero(numero)).join(', ');
-      const mensajeWhatsApp = `Hola, soy ${nombreCliente}. Quiero comprar los números: ${numerosTexto}. Mi teléfono es ${telefonoCliente}.`;
+      const mensajeWhatsApp = telefonoCliente
+        ? `Hola, soy ${nombreCliente}. Quiero comprar los números: ${numerosTexto}. Mi teléfono es ${telefonoCliente}.`
+        : `Hola, soy ${nombreCliente}. Quiero comprar los números: ${numerosTexto}.`;
 
       try {
         const response = await fetch(apiUrl('/api/confirmar-compra'), {
@@ -700,7 +702,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             nombre: nombreCliente,
-            numero: telefonoCliente,
+            telefono: telefonoCliente,
             numeros: items.map((n) => formatearNumero(n))
           })
         });
