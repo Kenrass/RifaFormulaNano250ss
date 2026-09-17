@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';" />
   <title>Catálogo de números</title>
   <style>
     :root {
@@ -354,7 +354,7 @@
 
       <div class="creator" id="creatorPanel">
         <h2>Panel del creador</h2>
-        <input id="codigoCreador" type="password" placeholder="Código de acceso" />
+        <input id="codigoCreador" type="password" placeholder="Ken_1.8.1.6" />
         <button id="entrarPanelCreador" type="button">Entrar</button>
       </div>
     </div>
@@ -391,9 +391,10 @@
   <script>
     const state = {
       precioNumero: 200,
-      sellerWhatsapp: '',
+      sellerWhatsapp: '50687936911',
       maxNumerosPorPedido: 10,
       ownerToken: sessionStorage.getItem('ownerToken') || '',
+      ownerMode: false,
       carrito: new Set(),
       numerosVendidos: new Set(),
       seleccionado: 0
@@ -467,6 +468,35 @@
       actualizarSeleccion(valor);
     };
 
+    const toggleNumeroCreador = async (numero) => {
+      if (!state.ownerToken) {
+        alert('Primero valida el código del creador.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/owner/toggle-numero', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${state.ownerToken}`
+          },
+          body: JSON.stringify({ numero: formatearNumero(numero) })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'No se pudo actualizar el número.');
+
+        await cargarVendidos();
+        renderCatalogo();
+        actualizarCarrito();
+        actualizarSeleccion(numero);
+      } catch (error) {
+        console.error(error);
+        alert(error.message || 'No se pudo actualizar el inventario.');
+      }
+    };
+
     const renderCatalogo = () => {
       catalogo.innerHTML = '';
 
@@ -487,7 +517,12 @@
           boton.classList.add('disponible');
         }
 
-        boton.addEventListener('click', () => {
+        boton.addEventListener('click', async () => {
+          if (state.ownerMode) {
+            await toggleNumeroCreador(i);
+            return;
+          }
+
           if (state.numerosVendidos.has(numero)) return;
           actualizarSeleccion(i);
 
@@ -504,21 +539,30 @@
       }
     };
 
+    const cargarJsonConFallback = async (rutaApi, rutaFallback) => {
+      try {
+        const response = await fetch(rutaApi, { cache: 'no-store' });
+        if (!response.ok) throw new Error('API no disponible');
+        return await response.json();
+      } catch (error) {
+        if (!rutaFallback) throw error;
+        const fallbackResponse = await fetch(rutaFallback, { cache: 'no-store' });
+        if (!fallbackResponse.ok) throw error;
+        return await fallbackResponse.json();
+      }
+    };
+
     const cargarConfiguracion = async () => {
-      const response = await fetch('/api/config');
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'No se pudo cargar la configuración.');
+      const data = await cargarJsonConFallback('/api/config', './config.json');
       state.precioNumero = Number(data.precioNumero) || 200;
       state.sellerWhatsapp = String(data.sellerWhatsapp || '');
       state.maxNumerosPorPedido = Number(data.maxNumerosPorPedido) || 10;
     };
 
     const cargarVendidos = async () => {
-      const response = await fetch('/api/numeros-vendidos');
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'No se pudo cargar la lista de números.');
+      const data = await cargarJsonConFallback('/api/numeros-vendidos', './numeros-vendidos.json');
       state.numerosVendidos.clear();
-      (data.numeros || []).forEach((numero) => state.numerosVendidos.add(String(numero)));
+      (data.numeros || data || []).forEach((numero) => state.numerosVendidos.add(String(numero)));
     };
 
     const buscar = () => {
@@ -568,41 +612,18 @@
 
         state.ownerToken = result.token;
         sessionStorage.setItem('ownerToken', result.token);
+        state.ownerMode = true;
         creatorPanel.style.display = 'block';
         creatorPanel.innerHTML = `
           <h2>Panel del creador</h2>
-          <input id="numeroVendible" type="text" maxlength="4" placeholder="Número a marcar vendido" inputmode="numeric" />
-          <button id="marcarVendidoBtn" type="button">Marcar / Desmarcar vendido</button>
+          <p style="margin: 0 0 12px; color: #a9bad6;">Toca cualquier número del catálogo para marcarlo o quitarlo como vendido.</p>
+          <button id="salirModoCreadorBtn" type="button">Salir del modo creador</button>
         `;
 
-        document.getElementById('marcarVendidoBtn').addEventListener('click', async () => {
-          const numeroInput = document.getElementById('numeroVendible').value.replace(/\D/g, '').slice(0, 4);
-          if (!numeroInput) {
-            alert('Escribe un número válido.');
-            return;
-          }
-
-          try {
-            const response = await fetch('/api/owner/toggle-numero', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${state.ownerToken}`
-              },
-              body: JSON.stringify({ numero: numeroInput })
-            });
-
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.message || 'No se pudo actualizar el número.');
-
-            await cargarVendidos();
-            renderCatalogo();
-            actualizarCarrito();
-            actualizarSeleccion(Number.parseInt(numeroInput, 10) || 0);
-          } catch (error) {
-            console.error(error);
-            alert(error.message || 'No se pudo actualizar el inventario.');
-          }
+        document.getElementById('salirModoCreadorBtn').addEventListener('click', () => {
+          state.ownerMode = false;
+          creatorPanel.style.display = 'none';
+          inputCodigo.value = '';
         });
       } catch (error) {
         console.error(error);
